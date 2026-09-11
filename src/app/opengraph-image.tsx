@@ -1,27 +1,23 @@
 import { ImageResponse } from "next/og";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { brand } from "@/data/brand";
+import { unbounded900 } from "@/assets/fonts/unbounded-900";
+import { onest500 } from "@/assets/fonts/onest-500";
 
 export const alt = "БЛИК — мойка окон в Москве";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-/** Fonts are bundled (OFL) so the image renders without network access at build time. */
-async function loadFonts() {
-  const dir = join(process.cwd(), "src/assets/fonts");
-  const [display, text] = await Promise.all([
-    readFile(join(dir, "unbounded-900.woff")),
-    readFile(join(dir, "onest-500.woff")),
-  ]);
+/** Fonts are bundled as base64 (OFL) so the image renders without file or network access. */
+function loadFonts() {
+  const decode = (b64: string) => Uint8Array.from(Buffer.from(b64, "base64")).buffer;
   return [
-    { name: "Unbounded", data: display, weight: 900 as const, style: "normal" as const },
-    { name: "Onest", data: text, weight: 500 as const, style: "normal" as const },
+    { name: "Unbounded", data: decode(unbounded900), weight: 900 as const, style: "normal" as const },
+    { name: "Onest", data: decode(onest500), weight: 500 as const, style: "normal" as const },
   ];
 }
 
 export default async function OpenGraphImage() {
-  const fonts = await loadFonts();
+  const fonts = loadFonts();
 
   return new ImageResponse(
     (
