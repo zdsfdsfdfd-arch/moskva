@@ -1,0 +1,234 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   БЛИК — design tokens
+   Cartoon + premium. Ink outlines, paper background, sky glass,
+   tangerine/sun/teal accents, muddy grime, indigo night.
+------------------------------------------------------------------- */
+@theme {
+  --color-ink: #1b1f2a;
+  --color-ink-soft: #3a4152;
+  --color-ink-mute: #6b7284;
+  --color-paper: #f6f1e7;
+  --color-cream: #fff9ee;
+  --color-sand: #eadfcb;
+  --color-sand-deep: #d9caae;
+  --color-sky: #a9e4f7;
+  --color-sky-deep: #5bc3e8;
+  --color-sky-pale: #d8f3fc;
+  --color-tangerine: #ff6b2c;
+  --color-tangerine-deep: #e2521a;
+  --color-sun: #ffd23f;
+  --color-sun-deep: #f2b90d;
+  --color-teal: #1fb6a6;
+  --color-teal-deep: #178f83;
+  --color-grime: #8c7a66;
+  --color-grime-light: #b8a88f;
+  --color-night: #101a3a;
+  --color-night-deep: #0a1129;
+  --color-window-warm: #ffc857;
+
+  --font-display: var(--font-unbounded), "Arial Black", Impact, sans-serif;
+  --font-sans: var(--font-onest), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-hand: var(--font-neucha), "Segoe Print", "Comic Sans MS", cursive;
+
+  --ease-water: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --shadow-lift: 0 14px 28px -18px rgba(27, 31, 42, 0.45);
+  --shadow-card: 0 2px 0 0 rgba(27, 31, 42, 0.08), 0 18px 34px -22px rgba(27, 31, 42, 0.4);
+  --shadow-ink: 0 4px 0 0 #1b1f2a;
+}
+
+:root {
+  color-scheme: light;
+  --nav-h: 76px;
+  --outline: 3px;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv05";
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-sun);
+  color: var(--color-ink);
+}
+
+/* Keyboard focus: one loud consistent ring everywhere. */
+:focus-visible {
+  outline: 3px solid var(--color-tangerine);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Custom cursor is enabled only after JS confirms a fine pointer. */
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
+}
+
+/* ---- Typography helpers ---- */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+.font-hand {
+  font-family: var(--font-hand);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Headline with a cream halo so it reads over dirty glass and city. */
+.halo {
+  text-shadow:
+    0 0 1px rgba(255, 249, 238, 0.9),
+    0 2px 0 rgba(255, 249, 238, 0.85),
+    0 -2px 0 rgba(255, 249, 238, 0.85),
+    2px 0 0 rgba(255, 249, 238, 0.85),
+    -2px 0 0 rgba(255, 249, 238, 0.85),
+    0 8px 22px rgba(27, 31, 42, 0.18);
+}
+
+/* ---- Grain ---- */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.055;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 220px 220px;
+  animation: grain-drift 1.6s steps(3) infinite;
+}
+@keyframes grain-drift {
+  0% { transform: translate(0, 0); }
+  33% { transform: translate(-3%, 2%); }
+  66% { transform: translate(2%, -3%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ---- Ink outline utility (thick cartoon border) ---- */
+@utility ink-border {
+  border: var(--outline) solid var(--color-ink);
+}
+@utility ink-border-2 {
+  border: 2px solid var(--color-ink);
+}
+
+/* Marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee var(--marquee-duration, 36s) linear infinite;
+}
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Character idle bob and blink */
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(-1deg); }
+}
+.idle-bob {
+  animation: bob 2.6s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.08); }
+}
+.blink {
+  animation: blink 4.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.blink-late {
+  animation-delay: 1.3s;
+}
+
+/* Sparkle pop */
+@keyframes sparkle-pop {
+  0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+  60% { transform: scale(1.25) rotate(8deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.sparkle-pop {
+  animation: sparkle-pop 0.6s var(--ease-snap) both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes twinkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.95; }
+  50% { transform: scale(0.75) rotate(20deg); opacity: 0.6; }
+}
+.twinkle {
+  animation: twinkle 2.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Water drip */
+@keyframes drip {
+  0% { transform: translateY(0) scaleY(1); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translateY(60px) scaleY(1.4); opacity: 0; }
+}
+.drip {
+  animation: drip 1.4s ease-in infinite;
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+/* Cloud drift */
+@keyframes drift {
+  from { transform: translateX(-4%); }
+  to { transform: translateX(4%); }
+}
+.drift {
+  animation: drift 18s ease-in-out infinite alternate;
+}
+
+/* Hide scrollbars on horizontal scrollers but keep them scrollable */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Reduced motion: keep it functional, kill decoration. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .grain::after,
+  .idle-bob,
+  .blink,
+  .twinkle,
+  .drip,
+  .drift,
+  .marquee-track,
+  .sparkle-pop {
+    animation: none !important;
+  }
+}
