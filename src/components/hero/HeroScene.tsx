@@ -68,6 +68,12 @@ export function HeroScene({ progress, stripes, staticClean = false }: Props) {
       const kw = (w / stripes) / KLIR_BLADE_W;
       const kh = kw * KLIR_ASPECT;
       const s = heroState(staticClean ? 1 : p, stripes);
+      if (staticClean) {
+        // reduced motion: clean glass, Klir parked, the brand headline stays — no sequence to play
+        s.heroText = 1;
+        s.finalText = 0;
+        s.hint = 0;
+      }
       clip.set(dirtClipPath(s.wipes));
       heroOpacity.set(s.heroText);
       heroY.set((1 - s.heroText) * -40);
