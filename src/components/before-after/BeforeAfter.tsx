@@ -13,28 +13,36 @@ import { clamp } from "@/lib/utils";
 
 const INK = "#1b1f2a";
 
-function lineFor(x: number) {
-  if (x >= 98) return "Вот. Теперь можно жить.";
-  if (x >= 70) return "Так уже лучше.";
-  if (x >= 35) return "Уже что-то.";
+/** Стартовое положение лезвия: чуть больше половины окна ещё грязное. */
+const START = 52;
+
+/** Реплика зависит от того, какая доля стекла уже чистая. */
+function lineFor(clean: number) {
+  if (clean >= 98) return "Вот. Теперь можно жить.";
+  if (clean >= 70) return "Так уже лучше.";
+  if (clean >= 35) return "Уже что-то.";
   return "Ну и ну.";
 }
 
 /**
- * One huge window; the divider is a squeegee blade. Drag it and the grime,
- * the dust, the light and the mascot's mood all follow.
+ * One huge window; the divider is a squeegee blade. `dirty` is the divider
+ * position in percent: everything left of it is the "before" side, so
+ * dragging right grows the grime and `clean = 100 - dirty` shrinks.
+ * Light, dust, the mascot's mood and the section tint all follow `clean`.
  */
 export function BeforeAfter() {
   const ref = useRef<HTMLDivElement>(null);
-  const [x, setX] = useState(28);
+  const [dirty, setDirty] = useState(START);
   const [dragging, setDragging] = useState(false);
   const [celebrated, setCelebrated] = useState(false);
+  const clean = 100 - dirty;
 
-  const mv = useMotionValue(28);
+  const mv = useMotionValue(START);
   const sx = useSpring(mv, { stiffness: 260, damping: 28, mass: 0.6 });
   const dirtClip = useTransform(sx, (v) => `inset(0 ${100 - v}% 0 0)`);
-  const glowOpacity = useTransform(sx, [0, 100], [0.1, 0.9]);
-  const dustOpacity = useTransform(sx, [0, 100], [1, 0]);
+  // чище слева от лезвия → больше солнца, меньше пыли
+  const glowOpacity = useTransform(sx, [0, 100], [0.9, 0.1]);
+  const dustOpacity = useTransform(sx, [0, 100], [0.35, 1]);
   const dividerLeft = useTransform(sx, (v) => `${v}%`);
 
   const update = useCallback(
@@ -44,8 +52,8 @@ export function BeforeAfter() {
       const r = el.getBoundingClientRect();
       const next = clamp(((clientX - r.left) / r.width) * 100, 0, 100);
       mv.set(next);
-      setX(next);
-      if (next >= 98) setCelebrated(true);
+      setDirty(next);
+      if (next <= 2) setCelebrated(true);
     },
     [mv],
   );
@@ -61,19 +69,20 @@ export function BeforeAfter() {
   };
   const stop = () => setDragging(false);
 
+  // Стрелки двигают ползунок «чистоты»: вправо — чище, то есть лезвие идёт влево.
   const onKey = (e: React.KeyboardEvent) => {
     const step = e.shiftKey ? 10 : 3;
-    let next = x;
-    if (e.key === "ArrowRight" || e.key === "ArrowUp") next = x + step;
-    else if (e.key === "ArrowLeft" || e.key === "ArrowDown") next = x - step;
-    else if (e.key === "Home") next = 0;
-    else if (e.key === "End") next = 100;
+    let next = dirty;
+    if (e.key === "ArrowRight" || e.key === "ArrowUp") next = dirty - step;
+    else if (e.key === "ArrowLeft" || e.key === "ArrowDown") next = dirty + step;
+    else if (e.key === "Home") next = 100;
+    else if (e.key === "End") next = 0;
     else return;
     e.preventDefault();
     next = clamp(next, 0, 100);
     mv.set(next);
-    setX(next);
-    if (next >= 98) setCelebrated(true);
+    setDirty(next);
+    if (next <= 2) setCelebrated(true);
   };
 
   return (
@@ -81,7 +90,7 @@ export function BeforeAfter() {
       id="before-after"
       aria-labelledby="before-after-title"
       className="relative overflow-hidden py-16 sm:py-24"
-      style={{ background: `color-mix(in oklab, var(--color-paper) ${100 - x * 0.35}%, var(--color-sky-pale))` }}
+      style={{ background: `color-mix(in oklab, var(--color-paper) ${100 - clean * 0.35}%, var(--color-sky-pale))` }}
     >
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
@@ -157,8 +166,8 @@ export function BeforeAfter() {
                   aria-label="Сравнение до и после: положение сгона"
                   aria-valuemin={0}
                   aria-valuemax={100}
-                  aria-valuenow={Math.round(x)}
-                  aria-valuetext={`${Math.round(x)}% стекла отмыто`}
+                  aria-valuenow={Math.round(clean)}
+                  aria-valuetext={`${Math.round(clean)}% стекла отмыто`}
                   onKeyDown={onKey}
                   className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 cursor-grab items-center justify-center rounded-full ink-border bg-tangerine shadow-[0_4px_0_0_#1b1f2a] active:cursor-grabbing"
                   data-cursor="drag"
@@ -199,11 +208,11 @@ export function BeforeAfter() {
           {/* Klir watches from the sill, right side */}
           <div className="pointer-events-none absolute -bottom-2 right-[3%] flex w-[clamp(80px,11vw,150px)] flex-col items-end sm:right-[5%]">
             <div className="pointer-events-auto mb-1 mr-[60%] whitespace-nowrap">
-              <SpeechBubble tail="bottom-right" size="sm" key={lineFor(x)}>
-                {lineFor(x)}
+              <SpeechBubble tail="bottom-right" size="sm" key={lineFor(clean)}>
+                {lineFor(clean)}
               </SpeechBubble>
             </div>
-            <Klir pose="stand" expression={x >= 70 ? "happy" : x >= 35 ? "smirk" : "focused"} look={{ x: (x - 50) / 50, y: 0.3 }} className="w-full" />
+            <Klir pose="stand" expression={clean >= 70 ? "happy" : clean >= 35 ? "smirk" : "focused"} look={{ x: (dirty - 50) / 50, y: 0.3 }} className="w-full" />
           </div>
         </div>
       </div>

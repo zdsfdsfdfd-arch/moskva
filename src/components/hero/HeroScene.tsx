@@ -12,6 +12,7 @@ import { Sparkle } from "@/components/brand/Sparkle";
 import { cta } from "@/data/nav";
 import { brand } from "@/data/brand";
 import { useFastScroll } from "@/lib/hooks";
+import { withBasePath } from "@/lib/basePath";
 import { Cradle } from "./Cradle";
 import { RunawayDrops } from "./RunawayDrops";
 import { dirtClipPath, heroState, KLIR_BLADE_W, KLIR_BLADE_Y } from "./heroTimeline";
@@ -187,7 +188,7 @@ export function HeroScene({ progress, stripes, staticClean = false }: Props) {
 
             {/* the grime, clipped away stripe by stripe */}
             <motion.img
-              src="/textures/dirt.svg"
+              src={withBasePath("/textures/dirt.svg")}
               alt=""
               aria-hidden
               draggable={false}

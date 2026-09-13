@@ -1,0 +1,32 @@
+[Unit]
+Description=BLIK — мойка окон (sitesameday.com/clear)
+Documentation=file:///var/www/blik/docs/DEPLOY.md
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/blik
+Environment=NODE_ENV=production
+
+# Слушаем только localhost: наружу сайт отдаёт nginx.
+ExecStart=/var/www/blik/node_modules/.bin/next start -H 127.0.0.1 -p 3100
+
+Restart=always
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=20
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=blik
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/var/www/blik/.next
+
+[Install]
+WantedBy=multi-user.target

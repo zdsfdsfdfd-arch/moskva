@@ -19,6 +19,12 @@ npm run lint
 работает в демо-режиме: бренд вымышленный, проекты подписаны как концепты,
 заявки не отправляются (пользователь видит предупреждение).
 
+## Деплой
+
+Инструкция для VPS с Ubuntu (nginx + systemd, сайт в подпапке домена) —
+[`docs/DEPLOY.md`](docs/DEPLOY.md). Готовые конфиги лежат в [`deploy/`](deploy).
+Подпапка задаётся переменной `NEXT_PUBLIC_BASE_PATH` и вшивается в сборку.
+
 ## Стек
 
 Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, Framer Motion,
@@ -49,6 +55,7 @@ src/components
 src/data                бренд, услуги, цены, FAQ, шаги, проекты, калькулятор
 src/lib                 хуки, motion-пресеты, прайс-модель, заявки, текстуры
 scripts                 playwright-скрипты для скриншотов и QA
+deploy                  systemd-юнит, блок nginx, скрипт обновления
 ```
 
 ## Заявки

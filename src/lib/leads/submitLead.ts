@@ -1,4 +1,5 @@
 import type { Lead, LeadProvider, LeadResult } from "./types";
+import { withBasePath } from "@/lib/basePath";
 
 /**
  * Единая точка отправки заявки. Интерфейс не меняется, когда появится
@@ -7,7 +8,7 @@ import type { Lead, LeadProvider, LeadResult } from "./types";
  */
 const apiProvider: LeadProvider = {
   async submit(lead) {
-    const res = await fetch("/api/lead", {
+    const res = await fetch(withBasePath("/api/lead"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(lead),
