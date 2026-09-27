@@ -7,8 +7,11 @@ import type { NextConfig } from "next";
  */
 const basePath = (process.env.NEXT_PUBLIC_BASE_PATH || "").replace(/\/$/, "");
 
+const staticExport = process.env.NEXT_PUBLIC_STATIC_EXPORT === "1";
+
 const nextConfig: NextConfig = {
   ...(basePath ? { basePath } : {}),
+  ...(staticExport ? { output: "export" as const, images: { unoptimized: true } } : {}),
   agentRules: false,
   reactStrictMode: true,
   poweredByHeader: false,

@@ -53,12 +53,16 @@ export const metadata: Metadata = {
     title: `${brand.name} — окна, через которые хочется смотреть`,
     description:
       "Мойка окон, панорамного остекления, витрин и стеклянных поверхностей в Москве.",
+    // Статический файл, а не генерируемый маршрут: так ссылка получает
+    // префикс подпапки, а хостинг отдаёт правильный content-type.
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: `${brand.name} — мойка окон в Москве` }],
   },
   twitter: {
     card: "summary_large_image",
     title: `${brand.name} — мойка окон в Москве`,
     description:
       "Мойка окон, панорамного остекления, витрин и стеклянных поверхностей в Москве.",
+    images: ["/og.png"],
   },
   robots: { index: true, follow: true },
 };

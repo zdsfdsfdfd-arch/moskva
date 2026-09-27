@@ -21,9 +21,20 @@ npm run lint
 
 ## Деплой
 
-Инструкция для VPS с Ubuntu (nginx + systemd, сайт в подпапке домена) —
-[`docs/DEPLOY.md`](docs/DEPLOY.md). Готовые конфиги лежат в [`deploy/`](deploy).
-Подпапка задаётся переменной `NEXT_PUBLIC_BASE_PATH` и вшивается в сборку.
+Два варианта, оба поддерживаются одной кодовой базой.
+
+**VPS (полноценный).** Инструкция для Ubuntu с nginx и systemd —
+[`docs/DEPLOY.md`](docs/DEPLOY.md), конфиги в [`deploy/`](deploy). Работает всё,
+включая приём заявок через `/api/lead`.
+
+**GitHub Pages (витрина).** Workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml)
+при каждом push в `main` собирает статику и публикует её. Включается один раз:
+Settings → Pages → Source: GitHub Actions. Pages отдаёт только статические
+файлы, поэтому серверного маршрута заявок там нет — форма честно работает в
+демо-режиме.
+
+Подпапка домена задаётся переменной `NEXT_PUBLIC_BASE_PATH` и вшивается в
+сборку; `NEXT_PUBLIC_STATIC_EXPORT=1` включает статический экспорт.
 
 ## Стек
 
