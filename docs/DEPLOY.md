@@ -41,8 +41,21 @@ node -v   # должно быть v20.x или новее
 
 ## 2. Загрузить файлы
 
-Вариант А — через SSH с вашего компьютера (PowerShell на Windows, из папки со
-скачанным архивом):
+Вариант А — клонировать репозиторий (удобнее всего: обновления потом одной
+командой `git pull`):
+
+```bash
+apt-get install -y git
+mkdir -p /var/www
+git clone https://github.com/zdsfdsfdfd-arch/moskva.git /var/www/blik
+ls /var/www/blik            # должен быть package.json
+```
+
+Если репозиторий приватный, понадобится deploy key или токен доступа —
+проще сделать его публичным либо воспользоваться вариантом Б.
+
+Вариант Б — загрузить архив с вашего компьютера (PowerShell на Windows, из
+папки со скачанным файлом):
 
 ```powershell
 scp blik-site-src.zip root@IP_СЕРВЕРА:/root/
@@ -59,10 +72,8 @@ rm -rf /root/blik-unzip /root/blik-site-src.zip
 ls /var/www/blik            # должен быть package.json
 ```
 
-Вариант Б — через File Manager в hPanel: загрузить архив, распаковать,
+Вариант В — через File Manager в hPanel: загрузить архив, распаковать,
 перенести содержимое в `/var/www/blik`.
-
----
 
 ## 3. Настройки сайта
 
@@ -202,14 +213,21 @@ nginx -t && systemctl reload nginx
 
 ## 8. Обновление после правок
 
-Залить новые файлы в `/var/www/blik` и выполнить:
+Если сайт клонирован из репозитория:
+
+```bash
+cd /var/www/blik && git pull
+sudo bash deploy/update.sh
+```
+
+Если файлы заливаются вручную — просто заменить их и выполнить:
 
 ```bash
 sudo bash /var/www/blik/deploy/update.sh
 ```
 
 Скрипт ставит зависимости, пересобирает, чинит права, перезапускает сервис и
-проверяет, что сайт отвечает.
+проверяет, что сайт отвечает. Файл `.env.production` он не трогает.
 
 ---
 
